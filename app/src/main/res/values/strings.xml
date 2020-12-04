@@ -1,3 +1,11 @@
 <resources>
+
     <string name="app_name">RastreoCovid</string>
+
+    <string name="personas">Personas</string>
+    <string name="amigos">Amigos</string>
+    <string name="disponibles">Disponibles</string>
+    <string name="aniadir">Añadir</string>
+    <string name="quitar">Quitar</string>
+
 </resources>
