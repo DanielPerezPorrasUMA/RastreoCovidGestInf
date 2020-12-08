@@ -1,8 +1,12 @@
 package com.example.rastreocovid.modelo;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BDHelper extends SQLiteOpenHelper {
 
@@ -21,6 +25,111 @@ public class BDHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { }
+
+    // Métodos DML (manipular datos)
+    // -----------------------------
+
+    /**
+     * Para realizar una consulta SELECT.
+     * @param ctxt El contexto actual.
+     * @param sentencia La sentencia a utilizar para la consulta.
+     * @return Las tuplas obtenidas como resultado del SELECT.
+     */
+    public static List<Object[]> select(Context ctxt, String sentencia) {
+
+        BDHelper bdh = new BDHelper(ctxt);
+        SQLiteDatabase bdLegible = bdh.getReadableDatabase();
+        Cursor cur = bdLegible.rawQuery(sentencia, null);
+
+        List<Object[]> resultados = new ArrayList<>();
+        if (cur.moveToFirst()) {
+            do {
+                int numCol = cur.getColumnCount();
+                Object[] tupla = new Object[numCol];
+                for (int i = 0; i < numCol; i++) {
+                    switch (cur.getType(i)) {
+
+                        case Cursor.FIELD_TYPE_BLOB:
+                            tupla[i] = cur.getBlob(i);
+                            break;
+
+                        case Cursor.FIELD_TYPE_FLOAT:
+                            tupla[i] = cur.getDouble(i);
+                            break;
+
+                        case Cursor.FIELD_TYPE_INTEGER:
+                            tupla[i] = cur.getInt(i);
+                            break;
+
+                        case Cursor.FIELD_TYPE_STRING:
+                            tupla[i] = cur.getString(i);
+                            break;
+
+                        default:
+                            tupla[i] = null;
+                            break;
+
+                    }
+                }
+                resultados.add(tupla);
+            } while (cur.moveToNext());
+        }
+
+        cur.close();
+        bdLegible.close();
+        bdh.close();
+
+        return resultados;
+
+    }
+
+    /**
+     * Para realizar una consulta SELECT que devuelva una única fila.
+     * @param ctxt El contexto actual.
+     * @param sentencia La sentencia a utilizar para la consulta.
+     * @return La primera tupla obtenida al hacer la consulta,
+     * o null si no hay tuplas en el resultado.
+     */
+    public static Object[] selectUnaFila(Context ctxt, String sentencia) {
+        List<Object[]> listaResultado = select(ctxt, sentencia);
+        if (listaResultado.size() > 0) {
+            return listaResultado.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Para realizar una consulta SELECT que devuelva un único valor.
+     * @param ctxt El contexto actual.
+     * @param sentencia La sentencia a utilizar para la consulta.
+     * @return El valor de la primera columna en la primera fila del resultado,
+     * o null si no existe.
+     */
+    public static Object selectEscalar(Context ctxt, String sentencia) {
+        Object[] tuplaResultado = selectUnaFila(ctxt, sentencia);
+        if (tuplaResultado != null && tuplaResultado.length > 0) {
+            return tuplaResultado[0];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Para realizar una consulta INSERT, UPDATE o DELETE.
+     * @param ctxt El contexto actual.
+     * @param sentencia La sentencia a utilizar para la consulta.
+     */
+    public static void modificar(Context ctxt, String sentencia) {
+        BDHelper bdh = new BDHelper(ctxt);
+        SQLiteDatabase bdEscribible = bdh.getWritableDatabase();
+        bdEscribible.execSQL(sentencia);
+        bdEscribible.close();
+        bdh.close();
+    }
+
+    // Métodos DDL (crear y configurar las tablas)
+    // -------------------------------------------
 
     private void crearTablas(SQLiteDatabase db) {
 
