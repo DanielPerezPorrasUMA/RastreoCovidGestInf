@@ -1,7 +1,6 @@
 package com.example.rastreocovid.modelo;
 
 import android.content.Context;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +53,19 @@ public class Persona {
     public int getId() { return id; }
     public String getNombre() { return nombre; }
     public String getApellidos() { return apellidos; }
+    public List<Persona> getPersonas() {
+
+        List<Object[]> id = BDHelper.select(contexto,
+                "SELECT ID FROM PERSONA"
+        );
+        List<Persona> resultados = new ArrayList<>();
+
+        for (Object[] tupla : id) {
+            resultados.add(new Persona(contexto, (int)tupla[0]));
+        }
+        return resultados;
+
+    }
     public List<Persona> getAmigos() {
 
         List<Object[]> idsAmigos = BDHelper.select(contexto,
@@ -108,6 +120,11 @@ public class Persona {
         id = -1;
         nombre = null;
         apellidos = null;
+    }
+
+    @Override
+    public String toString() {
+        return nombre + " " + apellidos;
     }
 
 }
