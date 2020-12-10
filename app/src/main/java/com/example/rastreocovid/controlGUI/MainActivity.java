@@ -26,10 +26,11 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout linealPersonas, linealAmigos, linealDisponibles;
     private List<Integer> listaPersonas = new ArrayList<>();
     private Button btnQuitar, btnAniadir;
+    private List<TableLayout> tablas = new ArrayList<>();
 
     private int numeroPersonas = 0;
-    private int seleccionado = -1;
-
+    private int idSeleccionado = -1;
+    private int idAnterior = -1;
 
 
     @Override
@@ -51,19 +52,45 @@ public class MainActivity extends AppCompatActivity {
     private void mostrarPersona(Persona p) { // En progreso
         View vistaP = getLayoutInflater().inflate(R.layout.activity_persona, null);
 
-        vistaP.setId(numeroPersonas);
+        vistaP.setId(p.getId());
+        //vistaP.setId(numeroPersonas);
 
         TextView id = (TextView) vistaP.findViewById(R.id.txtPersonaID);
-        id.setText(p.getId());
+        id.setText(" "+p.getId());
 
         TextView nombre = (TextView) vistaP.findViewById(R.id.txtPersonaNombre);
         nombre.setText(p.toString());
 
-        TableLayout tabla = (TableLayout) vistaP.findViewById(R.id.tlPersonas);
+        TableLayout t = (TableLayout) vistaP.findViewById(R.id.tlPersonas);
+        tablas.add(t);
 
+        t.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                t.setBackgroundColor(Color.CYAN);
+
+                if(idSeleccionado > -1) { // Solución Temporal
+                    //tablas.get(idAnterior).setBackgroundColor(Color.WHITE);
+                    for(TableLayout tAux : tablas) {
+                        if (!tAux.equals(t)){
+                            tAux.setBackgroundColor(Color.WHITE);
+                        }
+                    }
+                }
+
+                idAnterior = idSeleccionado;
+                idSeleccionado = p.getId();
+                // mostrar amigos y disponibles
+                //mostrarRelaciones();
+                // borrar seleccion del anterior
+
+            }
+
+        });
 
         linealPersonas.addView(vistaP);
-        listaPersonas.add(numeroPersonas);
+        listaPersonas.add(vistaP.getId());
         numeroPersonas++;
     }
 
@@ -71,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
         btnQuitar = findViewById(R.id.btnQuitar);
         btnAniadir = findViewById(R.id.btnAniadir);
         linealPersonas = findViewById(R.id.linealPersonas);
-        //linealAmigos = findViewById(R.id.linealAmigos);
-        //linealDisponibles = findViewById(R.id.linealDisponibles);
+        linealAmigos = findViewById(R.id.linealAmigos);
+        linealDisponibles = findViewById(R.id.linealDisponibles);
     }
 
     private void mostrarInfoDebug() {
