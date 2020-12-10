@@ -53,7 +53,7 @@ public class Persona {
     public int getId() { return id; }
     public String getNombre() { return nombre; }
     public String getApellidos() { return apellidos; }
-    public List<Persona> getPersonas() {
+    public static List<Persona> getPersonas(Context contexto) {
 
         List<Object[]> id = BDHelper.select(contexto,
                 "SELECT ID FROM PERSONA"

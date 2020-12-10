@@ -38,6 +38,13 @@
                     android:textColor="@color/white"
                     android:textSize="24sp" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linealPersonas"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"></LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -70,6 +77,12 @@
                     android:layout_weight="1"
                     android:text="@string/quitar" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linealAmigos"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"></LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -102,6 +115,12 @@
                     android:layout_weight="1"
                     android:text="@string/aniadir" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linealDisponibles"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"></LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
