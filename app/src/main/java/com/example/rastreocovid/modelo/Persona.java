@@ -67,10 +67,12 @@ public class Persona {
 
     }
     public List<Persona> getAmigos() {
-
+        String sentencia = "(SELECT ID2 FROM AMIGOS WHERE ID1=" + id + ") UNION" +
+                "(SELECT ID1 FROM AMIGOS WHERE ID2=" + id + ")";
+        String sentencia2 =
+                "Select ID2 from Amigos where ID1 = " + id + ";";
         List<Object[]> idsAmigos = BDHelper.select(contexto,
-                "(SELECT ID2 FROM AMIGOS WHERE ID1=" + id + ") UNION" +
-                "(SELECT ID1 FROM AMIGOS WHERE ID2=" + id + ")"
+                sentencia2
         );
         List<Persona> resultados = new ArrayList<>();
 
