@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout linealPersonas, linealAmigos, linealDisponibles;
     private List<Persona> listaPersonas = new ArrayList<>(); // Lista para personas
     private List<Persona> listaAmigos = new ArrayList<>(); // Lista para amigos
-    private List<Persona> listaDisponibles = new ArrayList<>(); // Lista para disponibles
+    private final List<Persona> listaDisponibles = new ArrayList<>(); // Lista para disponibles
 
     private Button btnQuitar, btnAniadir;
     private final List<TableLayout> tablasPersonas = new ArrayList<>();
@@ -105,23 +105,14 @@ public class MainActivity extends AppCompatActivity {
         linealAmigos = findViewById(R.id.linealAmigos);
         linealDisponibles = findViewById(R.id.linealDisponibles);
 
-        btnQuitar.setOnClickListener(v -> {
-            quitarAmigo();
-        });
-
-        btnAniadir.setOnClickListener(v -> {
-            aniadirAmigo();
-        });
-
+        btnQuitar.setOnClickListener(v -> quitarAmigo());
+        btnAniadir.setOnClickListener(v -> aniadirAmigo());
     }
 
     // Try y Catch?
     private void mostrarAmigosYDisponibles() {
-        tablasAmigos.clear();
-        tablasDisponibles.clear();
-        linealAmigos.removeAllViews();
-        linealDisponibles.removeAllViews();
 
+        limpiarAmigosYDisponibles();
         Persona p = listaPersonas.get(idSeleccionado);
         listaAmigos = p.getAmigos();
 
@@ -136,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         // Mostrar los disponibles (la lista cambia así,
         // que anulamos cualquier selección realizada previamente en ella)
         idSeleccionadoDisp = -1;
+        listaDisponibles.clear();
         for (Persona disponible : listaPersonas) {
             if (disponible.getId() != p.getId() && !listaAmigos.contains(disponible)) {
                 listaDisponibles.add(disponible);
@@ -232,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
         if (idSeleccionado > -1 && idSeleccionadoAmigos > -1) {
 
             Persona personaActual = listaPersonas.get(idSeleccionado);
-            Persona amigoSeleccionado = listaDisponibles.get(idSeleccionadoAmigos);
+            Persona amigoSeleccionado = listaAmigos.get(idSeleccionadoAmigos);
             personaActual.borrarAmigo(amigoSeleccionado);
 
             // Actualizar contenido de las listas Amigos y Disponibles
@@ -242,8 +234,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void limpiarAmigosYDisponibles() {
-
-
+        tablasAmigos.clear();
+        tablasDisponibles.clear();
+        linealAmigos.removeAllViews();
+        linealDisponibles.removeAllViews();
     }
 
     private void colorearFila(TableLayout layout) {

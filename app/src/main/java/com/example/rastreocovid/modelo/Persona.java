@@ -101,19 +101,30 @@ public class Persona {
     public void aniadirAmigo(Persona amigo) {
         if (amigo.id == id) {
             throw new RuntimeException("Una persona no puede ser amiga de sí misma");
-        } else if (BDHelper.selectUnaFila(contexto, "SELECT ID FROM PERSONA WHERE ID=" + amigo.id) != null) {
+        } else if (esAmigoDe(amigo)) {
             throw new RuntimeException("La persona " + amigo.id + " y la persona " + id + " ya son amigas");
         } else {
             BDHelper.modificar(contexto, "INSERT INTO AMIGOS VALUES (" + id + ", " + amigo.id + ")");
         }
     }
     public void borrarAmigo(Persona amigo) {
-        if (BDHelper.selectUnaFila(contexto, "SELECT ID FROM PERSONA WHERE ID=" + amigo.id) == null) {
+        if (!esAmigoDe(amigo)) {
             throw new RuntimeException("La persona " + amigo.id + " y la persona " + id + " no son amigas");
         } else {
             BDHelper.modificar(contexto, "DELETE FROM AMIGOS WHERE ID1=" + id + " AND ID2=" + amigo.id
                     + " OR ID1=" + amigo.id + " AND ID2=" + id);
         }
+    }
+
+    /**
+     * Devuelve si dos personas son amigas.
+     * @param otra La persona a comprobar con esta ("this").
+     * @return True sii "this" y "otra" son amigos.
+     */
+    public boolean esAmigoDe(Persona otra) {
+        return BDHelper.selectUnaFila(contexto, "SELECT ID1 FROM AMIGOS " +
+                "WHERE ID1=" + id + " AND ID2=" + otra.id + " OR " +
+                "ID1=" + otra.id + " AND ID2=" + id) != null;
     }
 
     // Borra la persona, invalidando sus atributos
