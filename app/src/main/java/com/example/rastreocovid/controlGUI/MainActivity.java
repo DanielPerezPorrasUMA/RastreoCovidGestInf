@@ -22,22 +22,18 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout linealPersonas, linealAmigos, linealDisponibles;
-    //private List<Integer> listaPersonas = new ArrayList<>(); // Lista para ID de personas
     private List<Persona> listaPersonas = new ArrayList<>(); // Lista para personas
-    private List<Persona> listaAmigos = new ArrayList<>();
-    //private List<Persona> listaDisponibles;
+    private List<Persona> listaAmigos = new ArrayList<>(); // Lista para amigos
+    private List<Persona> listaDisponibles = new ArrayList<>(); // Lista para disponibles
 
     private Button btnQuitar, btnAniadir;
     private final List<TableLayout> tablasPersonas = new ArrayList<>();
     private final List<TableLayout> tablasAmigos = new ArrayList<>();
     private final List<TableLayout> tablasDisponibles = new ArrayList<>();
 
-    private int numeroPersonas = 0; // Número de personas en la lista
-
-    // IDs ¡cuidado con no confundirlos!
-    private int idSeleccionadoBD = -1; // ID de la persona seleccionada en la BD
     private int idSeleccionado = -1; // ID de la persona seleccionada en la lista Personas
-    private int idAnterior = -1; // ID de la persona anteriormente seleccionada en la lista Personas
+    private int idSeleccionadoAmigos = -1; // ID de la persona seleccionada en la lista Amigos
+    private int idSeleccionadoDisp = -1; // ID de la persona seleccionada en la lista Disponibles
 
 
     @Override
@@ -76,10 +72,8 @@ public class MainActivity extends AppCompatActivity {
         tablasPersonas.add(t);
 
         linealPersonas.addView(vistaP);
-        numeroPersonas++;
     }
     private void setListenersPersonas() {
-
         for (int i = 0; i < tablasPersonas.size(); i++) {
             TableLayout t = tablasPersonas.get(i);
             Persona p = listaPersonas.get(i);
@@ -95,9 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 colorearFila(t);
 
                 // Actualizar IDs
-                idAnterior = idSeleccionado;
                 idSeleccionado = finalI;
-                idSeleccionadoBD = p.getId();
 
                 // Mostrar amigos y disponibles
                 mostrarAmigosYDisponibles();
@@ -133,83 +125,124 @@ public class MainActivity extends AppCompatActivity {
         Persona p = listaPersonas.get(idSeleccionado);
         listaAmigos = p.getAmigos();
 
+        // Mostrar los amigos (la lista cambia así,
+        // que anulamos cualquier selección realizada previamente en ella)
+        idSeleccionadoAmigos = -1;
         for (Persona amigo : listaAmigos) {
             mostrarAmigo(amigo);
         }
+        setListenersAmigos();
 
+        // Mostrar los disponibles (la lista cambia así,
+        // que anulamos cualquier selección realizada previamente en ella)
+        idSeleccionadoDisp = -1;
         for (Persona disponible : listaPersonas) {
             if (disponible.getId() != p.getId() && !listaAmigos.contains(disponible)) {
+                listaDisponibles.add(disponible);
                 mostrarDisponible(disponible);
             }
         }
+        setListenersDisponibles();
     }
 
     private void mostrarAmigo(Persona a) {
-        View vistaA = getLayoutInflater().inflate(R.layout.activity_persona, null);
-
+        View vistaA = getLayoutInflater().inflate(R.layout.activity_persona, linealAmigos, false);
         vistaA.setId(a.getId());
 
         TextView id = (TextView) vistaA.findViewById(R.id.txtPersonaID);
         id.setText("" + a.getId());
-
         TextView nombre = (TextView) vistaA.findViewById(R.id.txtPersonaNombre);
         nombre.setText(a.toString());
 
         TableLayout t = (TableLayout) vistaA.findViewById(R.id.tlPersonas);
         tablasAmigos.add(t);
-
-        t.setOnClickListener(v -> {
-            colorearFila(t);
-            if(idSeleccionadoBD > -1) { // Solución Temporal
-                for(TableLayout tAux : tablasAmigos) {
-                    if (!tAux.equals(t)){
-                        descolorearFila(tAux);
-                    }
-                }
-            }
-        });
-
         linealAmigos.addView(vistaA);
+    }
+    private void setListenersAmigos() {
+        for (int i = 0; i < tablasAmigos.size(); i++) {
+            TableLayout t = tablasAmigos.get(i);
+            int finalI = i;
+            t.setOnClickListener(v -> {
+
+                // Quitar color a la fila anterior
+                if (idSeleccionadoAmigos > -1) {
+                    descolorearFila(tablasAmigos.get(idSeleccionadoAmigos));
+                }
+
+                // Colorear fila seleccionada
+                colorearFila(t);
+
+                // Actualizar IDs
+                idSeleccionadoAmigos = finalI;
+
+            });
+        }
     }
 
     private void mostrarDisponible(Persona d) {
-        View vistaD = getLayoutInflater().inflate(R.layout.activity_persona, null);
-
+        View vistaD = getLayoutInflater().inflate(R.layout.activity_persona, linealDisponibles, false);
         vistaD.setId(d.getId());
 
         TextView id = (TextView) vistaD.findViewById(R.id.txtPersonaID);
         id.setText("" + d.getId());
-
         TextView nombre = (TextView) vistaD.findViewById(R.id.txtPersonaNombre);
         nombre.setText(d.toString());
 
         TableLayout t = (TableLayout) vistaD.findViewById(R.id.tlPersonas);
         tablasDisponibles.add(t);
-
-        t.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                colorearFila(t);
-                if(idSeleccionadoBD > -1) { // Solución Temporal
-                    for(TableLayout tAux : tablasDisponibles) {
-                        if (!tAux.equals(t)){
-                            descolorearFila(t);
-                        }
-                    }
-                }
-            }
-        });
-
         linealDisponibles.addView(vistaD);
+    }
+    public void setListenersDisponibles() {
+        for (int i = 0; i < tablasDisponibles.size(); i++) {
+            TableLayout t = tablasDisponibles.get(i);
+            int finalI = i;
+            t.setOnClickListener(v -> {
+
+                // Quitar color a la fila anterior
+                if (idSeleccionadoDisp > -1) {
+                    descolorearFila(tablasDisponibles.get(idSeleccionadoDisp));
+                }
+
+                // Colorear fila seleccionada
+                colorearFila(t);
+
+                // Actualizar IDs
+                idSeleccionadoDisp = finalI;
+
+            });
+        }
     }
 
     private void aniadirAmigo() {
+        // Comprobar selección
+        if (idSeleccionado > -1 && idSeleccionadoDisp > -1) {
+
+            Persona personaActual = listaPersonas.get(idSeleccionado);
+            Persona disponibleSeleccionado = listaDisponibles.get(idSeleccionadoDisp);
+            personaActual.aniadirAmigo(disponibleSeleccionado);
+
+            // Actualizar contenido de las listas Amigos y Disponibles
+            mostrarAmigosYDisponibles();
+
+        }
     }
 
     private void quitarAmigo() {
+        // Comprobar selección
+        if (idSeleccionado > -1 && idSeleccionadoAmigos > -1) {
+
+            Persona personaActual = listaPersonas.get(idSeleccionado);
+            Persona amigoSeleccionado = listaDisponibles.get(idSeleccionadoAmigos);
+            personaActual.borrarAmigo(amigoSeleccionado);
+
+            // Actualizar contenido de las listas Amigos y Disponibles
+            mostrarAmigosYDisponibles();
+
+        }
     }
 
     private void limpiarAmigosYDisponibles() {
+
 
     }
 

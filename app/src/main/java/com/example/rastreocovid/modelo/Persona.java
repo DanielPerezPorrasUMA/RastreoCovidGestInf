@@ -3,6 +3,7 @@ package com.example.rastreocovid.modelo;
 import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Persona {
 
@@ -67,13 +68,13 @@ public class Persona {
 
     }
     public List<Persona> getAmigos() {
-        String sentencia = "(SELECT ID2 FROM AMIGOS WHERE ID1=" + id + ") UNION" +
-                "(SELECT ID1 FROM AMIGOS WHERE ID2=" + id + ")";
-        String sentencia2 =
-                "Select ID2 from Amigos where ID1 = " + id + ";";
-        List<Object[]> idsAmigos = BDHelper.select(contexto,
-                sentencia2
-        );
+
+        // Tenemos que seleccionar tanto los que tengan ID1=id como ID2=id.
+        // Se puede usar una operación conjuntista como UNION, siempre que los tipos
+        // de las columnas de cada consulta coincidan.
+        String sentencia = "SELECT ID2 FROM AMIGOS WHERE ID1=" + id + " UNION " +
+                "SELECT ID1 FROM AMIGOS WHERE ID2=" + id;
+        List<Object[]> idsAmigos = BDHelper.select(contexto, sentencia);
         List<Persona> resultados = new ArrayList<>();
 
         for (Object[] tupla : idsAmigos) {
@@ -127,6 +128,19 @@ public class Persona {
     @Override
     public String toString() {
         return nombre + " " + apellidos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Persona persona = (Persona) o;
+        return id == persona.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 
 }
