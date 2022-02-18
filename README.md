@@ -1,4 +1,4 @@
-# RastreoCovidGIW
+# "RastreoCovid"
 
 This repository was used for a project for subject "Gestión de la Información" (Information Management) during my Software Engineering studies at University of Málaga
 to demonstrate how to use SQLite databases stored locally on Android devices.
